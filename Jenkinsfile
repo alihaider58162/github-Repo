@@ -28,7 +28,14 @@ pipeline {
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    // Only try to publish if test reports exist
+                    script {
+                        if (fileExists('target/surefire-reports/*.xml')) {
+                            junit 'target/surefire-reports/*.xml'
+                        } else {
+                            echo 'No test reports found - this is normal if no tests exist'
+                        }
+                    }
                 }
             }
         }
