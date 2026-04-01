@@ -17,14 +17,14 @@ pipeline {
         stage('Compile') {
             steps {
                 echo 'Compiling with Java 21...'
-                sh 'mvn clean compile'
+                bat 'mvn clean compile'
             }
         }
         
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'mvn test'
+                bat 'mvn test'
             }
             post {
                 always {
@@ -36,7 +36,7 @@ pipeline {
         stage('Package') {
             steps {
                 echo 'Creating JAR...'
-                sh 'mvn package -DskipTests'
+                bat 'mvn package -DskipTests'
             }
             post {
                 success {
