@@ -1,11 +1,11 @@
 pipeline {
     agent any
-    
+
     tools {
         maven 'maven-3'
         jdk 'jdk-21'
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -13,41 +13,19 @@ pipeline {
                 checkout scm
             }
         }
-        
-        stage('Compile') {
+
+        stage('Compile & Package') {
             steps {
-                echo 'Compiling with Java 21...'
-                bat 'mvn clean compile'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-                bat 'mvn test'
-            }
-            post {
-                always {
-                    // Only try to publish if test reports exist
-                    script {
-                        if (fileExists('target/surefire-reports/*.xml')) {
-                            junit 'target/surefire-reports/*.xml'
-                        } else {
-                            echo 'No test reports found - this is normal if no tests exist'
-                        }
-                    }
-                }
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                echo 'Creating JAR...'
-                bat 'mvn package -DskipTests'
+                echo 'Moving to JenkinsCICD folder and building...'
+                bat '''
+                    cd JenkinsCICD
+                    mvn clean package
+                '''
             }
             post {
                 success {
-                    archiveArtifacts 'target/*.jar'
+                    // JAR ab JenkinsCICD/target/ folder mein banegi
+                    archiveArtifacts 'JenkinsCICD/target/*.jar'
                 }
             }
         }
