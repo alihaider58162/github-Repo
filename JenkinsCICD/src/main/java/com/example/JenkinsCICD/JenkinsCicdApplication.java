@@ -8,6 +8,7 @@ public class JenkinsCicdApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(JenkinsCicdApplication.class, args);
+		// Test
 	}
 	// Ali Haider
 }
