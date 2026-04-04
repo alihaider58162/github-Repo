@@ -14,20 +14,45 @@ pipeline {
             }
         }
 
-        stage('Compile & Package') {
+        stage('Compile') {
             steps {
-                echo 'Moving to JenkinsCICD folder and building...'
-                bat '''
-                    cd JenkinsCICD
-                    mvn clean package
-                '''
+                echo 'Compiling...'
+                bat 'cd JenkinsCICD && mvn clean compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running unit tests...'
+                bat 'cd JenkinsCICD && mvn test'
+            }
+            post {
+                always {
+                    // Publish test reports
+                    junit 'JenkinsCICD/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo 'Creating JAR...'
+                bat 'cd JenkinsCICD && mvn package -DskipTests'
             }
             post {
                 success {
-                    // JAR ab JenkinsCICD/target/ folder mein banegi
                     archiveArtifacts 'JenkinsCICD/target/*.jar'
                 }
             }
+        }
+    }
+    
+    post {
+        success {
+            echo '🎉 Build and tests completed successfully!'
+        }
+        failure {
+            echo '❌ Build or tests failed!'
         }
     }
 }
