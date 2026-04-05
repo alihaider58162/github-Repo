@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
         DOCKER_IMAGE = 'alihaider58162/car-app'
     }
 
@@ -53,21 +52,18 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                script {
-                    docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
-                    docker.build("${DOCKER_IMAGE}:latest")
-                }
+                bat 'docker build -t alihaider58162/car-app:latest .'
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 echo 'Pushing to Docker Hub...'
-                script {
-                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
-                        docker.image("${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
-                        docker.image("${DOCKER_IMAGE}:latest").push()
-                    }
+                withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_PASS')]) {
+                    bat '''
+                        echo %DOCKER_PASS% | docker login -u alihaider58162 --password-stdin
+                        docker push alihaider58162/car-app:latest
+                    '''
                 }
             }
         }
@@ -75,13 +71,11 @@ pipeline {
         stage('Deploy & Run Container') {
             steps {
                 echo 'Deploying container...'
-                script {
-                    bat '''
-                        docker stop car-app || true
-                        docker rm car-app || true
-                        docker run -d -p 7779:7779 --name car-app alihaider58162/car-app:latest
-                    '''
-                }
+                bat '''
+                    docker stop car-app || true
+                    docker rm car-app || true
+                    docker run -d -p 7779:7779 --name car-app alihaider58162/car-app:latest
+                '''
             }
         }
 
@@ -98,11 +92,10 @@ pipeline {
     
     post {
         success {
-            echo '🎉 Full CI/CD Pipeline Completed!'
-            echo '✅ App is running on Docker at http://localhost:7779'
+            echo '🎉 Full pipeline completed! App running on Docker!'
         }
         failure {
-            echo '❌ Pipeline failed! Check logs.'
+            echo '❌ Pipeline failed!'
         }
     }
 }
