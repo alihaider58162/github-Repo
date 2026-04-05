@@ -74,7 +74,7 @@ pipeline {
                 bat '''
                     docker stop car-app || echo "No container to stop"
                     docker rm car-app || echo "No container to remove"
-                    docker run -d -p 7779:7779 --name car-app alihaider58162/car-app:latest
+                    docker run -d -p 7778:7778 --name car-app alihaider58162/car-app:latest
                 '''
             }
         }
@@ -84,7 +84,7 @@ pipeline {
         success {
             echo '🎉 Full pipeline completed!'
             echo '✅ App built, tested, pushed to Docker Hub, and container started!'
-            echo '🌐 Check: http://localhost:7779'
+            echo '🌐 Check: http://localhost:7778'
         }
         failure {
             echo '❌ Pipeline failed!'
