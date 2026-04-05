@@ -74,7 +74,7 @@ pipeline {
                 bat '''
                     docker stop car-app || true
                     docker rm car-app || true
-                    docker run -d -p 7779:7779 --name car-app alihaider58162/car-app:latest
+                    docker run -d -p 8080:8080 --name car-app alihaider58162/car-app:latest
                 '''
             }
         }
@@ -84,7 +84,7 @@ pipeline {
                 echo 'Checking application health...'
                 script {
                     sleep time: 15, unit: 'SECONDS'
-                    bat 'curl -f http://localhost:7779/actuator/health || exit 1'
+                    bat 'curl -f http://localhost:8080/actuator/health || exit 1'
                 }
             }
         }
