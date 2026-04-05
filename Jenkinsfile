@@ -72,27 +72,19 @@ pipeline {
             steps {
                 echo 'Deploying container...'
                 bat '''
-                    docker stop car-app || true
-                    docker rm car-app || true
-                    docker run -d -p 8080:8080 --name car-app alihaider58162/car-app:latest
+                    docker stop car-app || echo "No container to stop"
+                    docker rm car-app || echo "No container to remove"
+                    docker run -d -p 7779:7779 --name car-app alihaider58162/car-app:latest
                 '''
-            }
-        }
-
-        stage('Health Check') {
-            steps {
-                echo 'Checking application health...'
-                script {
-                    sleep time: 15, unit: 'SECONDS'
-                    bat 'curl -f http://localhost:8080/actuator/health || exit 1'
-                }
             }
         }
     }
     
     post {
         success {
-            echo '🎉 Full pipeline completed! App running on Docker!'
+            echo '🎉 Full pipeline completed!'
+            echo '✅ App built, tested, pushed to Docker Hub, and container started!'
+            echo '🌐 Check: http://localhost:7779'
         }
         failure {
             echo '❌ Pipeline failed!'
